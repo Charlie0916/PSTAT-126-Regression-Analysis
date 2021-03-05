@@ -1,0 +1,110 @@
+---
+title: "PSTAT 126 HW6"
+author: Mujie Wang
+date: 06/08/2018
+output: pdf_document
+---
+Problem 1
+```{r}
+data(state)
+state.x77 = as.data.frame(state.x77)
+dim(state.x77)
+colnames(state.x77)[4] = 'Life.Exp'
+```
+(a)
+```{r}
+mod0 = lm(Life.Exp ~1, data = state.x77)
+mod1 = lm(Life.Exp ~., data = state.x77)
+step(mod0, scope = list(upper = mod1))
+```
+According to AIC, the "best" model has the four predictors: Murder, HS Grad, Frost and Population.
+
+(b)
+```{r}
+library(leaps)
+mod = regsubsets(state.x77[,-4], state.x77[,4])
+sum.mod = summary(mod)
+sum.mod$which
+
+sum.mod$cp
+
+cp = sum.mod$cp
+plot(2:8, cp)
+abline(1,1)
+```
+The Cp criterion suggests the ???best??? model with four predictors: Murder, HS Grad, Frost and Population. Cp is close to p when p=4, and the model with p = 4 is simpler than the model with p = 5 or p = 6.
+(c)
+```{r}
+sum.mod$adjr2
+plot(sum.mod$adjr2)
+```
+The adjusted R2 criterion suggests the ???best??? model with four predictors: Murder, HS Grad, Frost and Population. This model has the largest adjusted R2 value.
+
+
+(d)
+```{r}
+mod.adjr2 = lm(Life.Exp ~ Population + Murder + `HS Grad` + Frost, data = state.x77) 
+hv = hatvalues(mod.adjr2)
+p=5
+n = nrow(state.x77)
+which(hv > 3*p/n)
+
+rs = rstudent(mod.adjr2)
+which(abs(rs) == max(abs(rs)))
+
+dfs = dffits(mod.adjr2)
+which(abs(dfs) == max(abs(dfs)))
+```
+California has the largest leverage value. Hawaii has the largest externally studentized residual and DIFFITS absolue value.
+
+```{r}
+mod.delete = lm(Life.Exp ~ Population + Murder + `HS Grad` + Frost, data = state.x77[-11,])
+summary(mod.delete)
+```
+Problem 2
+```{r}
+library(MASS)
+library(alr4)
+data(lathe1)
+```
+(a)
+```{r}
+boxcox(Life ~ Speed + Feed + I(Speed^2) +I(Feed^2) + Speed*Feed, data = lathe1)
+```
+lamda = 0 is in the 95% con dence interval for lamda, and when lamda = 0, the plot suggests log-transforming the response.
+
+(b)
+```{r}
+mod.reduced = lm(log(Life)~1, data = lathe1)
+mod.full = lm(log(Life)~ Speed + Feed + I(Speed^2) + I(Feed^2) + Speed * Feed, data = lathe1)
+anova(mod.reduced, mod.full)
+```
+
+(c)
+The Null hypothesis means the response Life is not linearly related to Speed.
+
+(d)
+```{r}
+mod.reduced2 = lm(log(Life)~Feed + I(Feed^2), data = lathe1)
+anova(mod.reduced2, mod.full)
+```
+Since the p-value is very close to 0, the we reject Ho.
+
+(e)
+```{r}
+fit1 = lm(log(Life) ~ Speed + Feed + I(Speed^2) +I(Feed^2) + Speed*Feed, data = lathe1) 
+plot(fit1, which = 4)
+abline(h = 0.5, lty = 2)
+
+cds = cooks.distance(fit1) 
+sort(cds, decreasing = TRUE)
+```
+The 9 and 10 cases have the largest Cook???s distance Di. Di for both cases are larger than 0.5, which suggests that the two cases might be in uential.
+```{r}
+fit2 = lm(log(Life) ~ Speed + Feed + I(Speed^2) +I(Feed^2) + Speed*Feed, data = lathe1[-c(9,10),])
+summary(fit1)
+
+summary(fit2)
+```
+
+The coeffcient most a ected is the main effect for Speed, while the others stay mostly the same. Also, the standard errors are uniformly smaller using the reduced data set. The R^2 and adjusted R^2 are larger using the reduced data set.

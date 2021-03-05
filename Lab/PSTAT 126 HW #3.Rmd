@@ -1,0 +1,103 @@
+---
+title: 'PSTAT 126 HW #3'
+author: "Mujie Wang"
+date: "04/27/2018"
+output: pdf_document
+---
+
+```{r}
+#Problem 1
+#(a)
+library(faraway)
+data(prostate)
+
+lpsa = prostate$lpsa
+lcavol = prostate$lcavol
+
+fit = lm(lpsa ~ lcavol)
+anova(fit)
+
+#(b)
+dim(anova(fit))
+anova(fit)
+
+ssr = anova(fit)[1,2]
+ssr
+
+sse = anova(fit)[2,2]
+sse
+
+ssto = sse + ssr
+ssto
+
+#From the anova table, ssr = 69.003 and it is explained by regression. 
+#sse = 58.915 and which is unexplained. 
+#The total variability in lpsa ssto = ssr + sse = 127.918.
+
+#(c)
+# Alternative hypothesis test: (H0: not equal 0)
+#Decision rule: if p-value < a, we reject H0
+#otherwise, we fail to reject H0; if the test statistic 
+#F* > F(1-a,1,n-2), then we reject H0; otherwise, we fail to reject H0.
+#Conclusion: by the ANOVA table, the p-value for the
+#F-test is extremely close to zero.
+#We can reject H0: B1 =0 given that a =0.05, 
+#and conclude that there is a signi cant linear relationship between lpsa and lcavol.
+
+#Problem 2
+#(a)
+library(faraway)
+data(prostate)
+
+age = fat$age
+brozek = fat$brozek
+fit = lm(brozek ~ age)
+
+#(b)
+r2 = summary(fit)$r.squared
+r2
+#Coefficient of determination R2 = 0.083621324. About 8.4% variability 
+#in the response brozek is reduced (explained) by the predictor age.
+
+#(c)
+weight = fat$weight
+e = resid(fit)
+plot(weight,e, xlab = 'weight', ylab = 'residual', main = 'residual vs weight')
+
+#(d)
+fit_new = lm(brozek ~ age + weight)
+r2_new = summary(fit_new)$r.squared
+r2_new
+
+#Problem 3
+#(a)
+library(datasets)
+library(MASS)
+
+data(cars)
+
+x = cars$speed
+y = cars$dist
+
+fit = lm(y~x)
+plot(x,y, xlab = "Speed", ylab = "Distance", main = "Distance vs Speed")
+#the linear line shows that there is a positive relationship between
+lines(x, fitted(fit), col = "RED")
+
+#(b)
+yhat = fitted(fit)
+e = y - yhat
+plot(fit, which = 1)
+abline(h=0)
+#sccording to the plot, we can see that there are more dots under the line and the dots are more dispersed as x increases
+#therefore, it indicated non-constant error variance.
+
+#(c)
+qqnorm(e)
+qqline(e)
+#according to the plot, the line is almost to linear relationship but it still has some outliers.
+
+#(d)
+shapiro.test(e)$p
+```
+ the residual of the linear fit in part a is normally distributed, but the vriance is not. In shapiro test, we conclude that p-value is 0.02152 which is smaller than our confidence level 0.05, so we should reject that errors are normally distributed.

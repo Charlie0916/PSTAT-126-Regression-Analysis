@@ -1,0 +1,6 @@
+---
+title: "PSTAT 126 HW5"
+author: "Mujie Wang"
+date: "2018/05/18"
+output: pdf_document
+---

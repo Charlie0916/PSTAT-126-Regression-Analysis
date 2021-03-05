@@ -1,0 +1,108 @@
+---
+title: "PSTAT 174 HW3"
+author: "Mujie Wang"
+date: "2018/11/11"
+output: pdf_document
+---
+#ARMA(1,1)
+```{r}
+x1 <- arima.sim(n = 100,model = list(ar = -0.6,ma = 1.2))
+plot(x1, xlab = "t",ylab = expression(X[t]),
+     main = expression(paste(ARMA(1,1),phi[1] == -0.6,theta[1] == 1.2,sep = " ")))
+
+```
+(ii) compute and graph their theoretical ACF and PACF using R
+```{r}
+# compute ACF and PACF
+acf1 = ARMAacf(ar = -0.6,ma = 1.2,pacf = FALSE,lag.max = 10)
+pacf1 = ARMAacf(ar = -0.6,ma = 1.2,pacf = TRUE,lag.max = 10)
+# Plot
+op <- par(mfrow = c(1,2))
+# ACF
+plot(x = 0:10,y = acf1,type = "h",col = "blue",ylab = "ACF",xlab = "h") 
+abline(h = 0)
+#PACF (Theoretical PACF values are computed starting form lag = 0)
+plot(x = 1:10,y = pacf1,type = "h",col = "blue",ylab = "PACF",xlab = "h") 
+abline(h = 0)
+title(expression(paste(ARMA(1,1),phi[1] == -0.6,theta[1] == 1.2,sep = " ")),
+      line = -1, outer=TRUE)
+par(op)
+```
+(iii) compute and graph their sample ACF and PACF using R. How do sample functions compare to
+their theoretical counterparts?
+
+```{r}
+op <- par(mfrow = c(1,2))
+#ACF
+acf(x1,lag.max = 10,main = "")
+# PACF
+pacf(x1,lag.max = 10,main = "")
+title(expression(paste("Simulated ARMA(1,1): ",phi[1] == -0.6,theta[1] == 1.2,sep = " ")),
+      line = -1, outer=TRUE)
+par(op)
+```
+Both sample ACF and PACF cut off after lag 1, and remain in the confidence band (blue dashed
+lines), which matches with the theoretical ACF/PACF behavior; both spike at 1, and then decay
+exponentially.
+
+
+(iv) Analyze smoothness of the simulated processes using their ACF???s. Please include the code
+with clear comments explaining the meaning of the code. Make sure to label the graphs.
+
+It is not smooth because the ACF oscillates bteween positive and negative values and it then
+dacays very rapidly, which implies small dependence on the previous values.
+
+
+
+(b)
+(i) Simulate and plot 100 values of the processes
+```{r}
+# ARMA(2,0) = AR(2)
+x2 <- arima.sim(n = 100,model = list(ar = c(-0.2,0.48))) 
+plot(x2, xlab = "t",ylab = expression(X[t]), main = expression(paste(AR(2),phi[1] == -0.2,phi[2] == 0.48,sep = " ")))
+```
+
+(ii) compute and graph their theoretical ACF and PACF using R
+```{r}
+# Compute ACF/PACF
+acf2 = ARMAacf(ar = c(-0.2,0.48),pacf = FALSE,lag.max = 10) 
+pacf2 = ARMAacf(ar = c(-0.2,0.48),pacf = TRUE,lag.max = 10)
+op <- par(mfrow = c(1,2))
+# ACF
+plot(x = 0:10,y = acf2,type = "h",col = "blue",ylab = "ACF",xlab = "h") 
+abline(h = 0)
+#PACF (Theoretical PACF values are computed starting form lag = 0)
+plot(x = 1:10,y = pacf2,type = "h",col = "blue",ylab = "PACF",xlab = "h") 
+abline(h = 0)
+title(main = expression(paste(AR(2),phi[1] == -0.2,phi[2] == 0.48,sep = " ")), 
+      line = -1, outer=TRUE)
+
+par(op)
+
+```
+
+(iii)compute and graph their sample ACF and PACF using R. How do sample functions compare to
+their theoretical counterparts?
+
+```{r}
+op <- par(mfrow = c(1,2))
+# ACF
+acf(x2,lag.max = 10,main = "") # PACF
+pacf(x2,lag.max = 10,main = "")
+title(main = expression(paste("Simulated AR(2): ",phi[1] == -0.2,phi[2] == 0.48,sep = " ")),
+      line = -1, outer=TRUE)
+par(op)
+```
+
+The overall behaviour of the sample and theoretical ACF/PACF is the same: the first 2 sample 
+PACF values are significantly different than zero and its sign is the same. Moreover, the 
+sample PACF lie within the estimated 95% confidence bounds after lag-2. On the otherhand, the
+ACF decays exponentially as the lag increases oscillating between potive and negative values
+(due to the change in sign of the AR coefficients).
+
+(iv) Analyze smoothness of the simulated processes using their ACF???s. Please include the code
+with clear comments explaining the meaning of the code. Make sure to label the graphs.
+
+Since the sign of the ACF oscillates and the magnitude of the ACF decays proportionally with 
+respect to the lag, then this indicates that the time series will change vary rapidly so the 
+time series is not smooth.
